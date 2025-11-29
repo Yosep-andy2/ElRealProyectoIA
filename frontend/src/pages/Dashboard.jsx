@@ -1,0 +1,59 @@
+import { Upload, FileText, Clock, Activity } from 'lucide-react';
+
+const StatCard = ({ title, value, icon: Icon, color }) => (
+    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between">
+            <div>
+                <p className="text-sm text-gray-500 font-medium">{title}</p>
+                <h3 className="text-2xl font-bold mt-1 text-gray-900">{value}</h3>
+            </div>
+            <div className={`p-3 rounded-lg ${color}`}>
+                <Icon className="w-6 h-6 text-white" />
+            </div>
+        </div>
+    </div>
+);
+
+const Dashboard = () => {
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
+                <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                    <Upload className="w-4 h-4" />
+                    Subir Documento
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard
+                    title="Documentos"
+                    value="12"
+                    icon={FileText}
+                    color="bg-blue-500"
+                />
+                <StatCard
+                    title="Procesados"
+                    value="8"
+                    icon={Activity}
+                    color="bg-green-500"
+                />
+                <StatCard
+                    title="Tiempo Ahorrado"
+                    value="4.5h"
+                    icon={Clock}
+                    color="bg-purple-500"
+                />
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Actividad Reciente</h3>
+                <div className="text-center py-8 text-gray-500">
+                    No hay actividad reciente para mostrar.
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Dashboard;
