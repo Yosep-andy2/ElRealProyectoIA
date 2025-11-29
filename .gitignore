@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.DS_Store
+
+# Node
+node_modules/
+dist/
+build/
+.npm/
+
+# IDE
+.vscode/
+.idea/
+
+# Project specific
+storage/documents/*
+storage/processed/*
+storage/cache/*
+storage/exports/*
+!storage/**/.gitkeep

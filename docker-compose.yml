@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  # Backend and Frontend services will be added here
+  # database:
+  #   image: postgres:15
+  #   ...
