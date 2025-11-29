@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from ..models.document import Document, DocumentStatus
 from ..parsers.pdf_parser import PDFParser
 from ..services.ai_service import AIService
+from ..services.vector_store import vector_store
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,10 @@ class DocumentProcessor:
             summary = await AIService.generate_summary(text_content)
             doc.summary_short = summary
             
-            # 3. Complete
+            # 3. Index in Vector Store
+            await vector_store.add_document(document_id, text_content)
+            
+            # 4. Complete
             doc.status = DocumentStatus.COMPLETED
             db.commit()
             
