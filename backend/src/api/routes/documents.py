@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from ...db.connection import get_db
 from ...models.document import Document, DocumentStatus
+from ...utils.file_handler import FileHandler
 
 router = APIRouter()
 
@@ -14,11 +15,15 @@ async def upload_document(
     """
     Upload a new document.
     """
-    # TODO: Implement actual file saving logic
+    # Save file physically
+    file_info = await FileHandler.save_file(file)
+    
+    # Create DB record
     doc = Document(
-        title=file.filename,
-        filename=file.filename,
-        file_type=file.content_type,
+        title=file_info["filename"],
+        filename=file_info["saved_filename"],
+        file_path=file_info["file_path"],
+        file_type=file_info["file_type"],
         status=DocumentStatus.UPLOADED
     )
     db.add(doc)

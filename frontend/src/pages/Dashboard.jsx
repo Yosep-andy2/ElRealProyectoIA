@@ -1,4 +1,6 @@
-import { Upload, FileText, Clock, Activity } from 'lucide-react';
+import { useState } from 'react';
+import { Upload, FileText, Clock, Activity, X } from 'lucide-react';
+import DocumentUpload from '../components/document/DocumentUpload';
 
 const StatCard = ({ title, value, icon: Icon, color }) => (
     <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -15,15 +17,38 @@ const StatCard = ({ title, value, icon: Icon, color }) => (
 );
 
 const Dashboard = () => {
+    const [showUploadModal, setShowUploadModal] = useState(false);
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-                <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                <button
+                    onClick={() => setShowUploadModal(true)}
+                    className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
                     <Upload className="w-4 h-4" />
                     Subir Documento
                 </button>
             </div>
+
+            {showUploadModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
+                        <button
+                            onClick={() => setShowUploadModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Subir Nuevo Documento</h3>
+                        <DocumentUpload onUploadSuccess={() => {
+                            // Optional: Refresh dashboard stats
+                            setTimeout(() => setShowUploadModal(false), 1500);
+                        }} />
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
