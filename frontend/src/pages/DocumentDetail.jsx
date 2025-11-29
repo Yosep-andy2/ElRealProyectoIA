@@ -11,7 +11,16 @@ const DocumentDetail = () => {
 
     useEffect(() => {
         loadDocument();
-    }, [id]);
+
+        // Poll for updates if processing
+        const interval = setInterval(() => {
+            if (document && document.status === 'processing') {
+                loadDocument();
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [id, document?.status]);
 
     const loadDocument = async () => {
         try {
@@ -76,9 +85,12 @@ const DocumentDetail = () => {
                                             {document.author}
                                         </span>
                                     )}
-                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${document.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${document.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                            document.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
+                                                'bg-gray-100 text-gray-700'
                                         }`}>
-                                        {document.status}
+                                        {document.status === 'completed' ? 'Procesado' :
+                                            document.status === 'processing' ? 'Procesando' : 'Subido'}
                                     </span>
                                 </div>
                             </div>
@@ -100,9 +112,22 @@ const DocumentDetail = () => {
                     <div className="space-y-6">
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-3">Resumen</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">
-                                {document.summary_short || "El resumen aún no ha sido generado. El procesamiento por IA se implementará en la siguiente fase."}
-                            </p>
+                            <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                {document.status === 'processing' ? (
+                                    <div className="flex items-center gap-2 text-indigo-600">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+                                        <span className="text-sm">Generando resumen con IA...</span>
+                                    </div>
+                                ) : document.summary_short ? (
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        {document.summary_short}
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-400 text-sm italic">
+                                        No hay resumen disponible.
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
