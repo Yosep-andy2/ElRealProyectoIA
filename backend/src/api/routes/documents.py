@@ -7,7 +7,9 @@ from ...utils.file_handler import FileHandler
 
 router = APIRouter()
 
-@router.post("/upload", status_code=201)
+from ...schemas.document import DocumentResponse
+
+@router.post("/upload", status_code=201, response_model=DocumentResponse)
 async def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
@@ -31,7 +33,7 @@ async def upload_document(
     db.refresh(doc)
     return doc
 
-@router.get("/", response_model=List[dict])
+@router.get("/", response_model=List[DocumentResponse])
 def get_documents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Retrieve all documents.
@@ -39,7 +41,7 @@ def get_documents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     docs = db.query(Document).offset(skip).limit(limit).all()
     return docs
 
-@router.get("/{document_id}")
+@router.get("/{document_id}", response_model=DocumentResponse)
 def get_document(document_id: int, db: Session = Depends(get_db)):
     """
     Get a specific document by ID.
