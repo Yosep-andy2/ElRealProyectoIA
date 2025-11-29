@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText, Calendar, User, Download } from 'lucide-react';
 import { documentService } from '../services/documentService';
+import ChatInterface from '../components/chat/ChatInterface';
 
 const DocumentDetail = () => {
     const { id } = useParams();
@@ -104,9 +105,11 @@ const DocumentDetail = () => {
 
                 <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-gray-50 rounded-lg p-8 text-center border-2 border-dashed border-gray-200">
+                        <div className="bg-gray-50 rounded-lg p-8 text-center border-2 border-dashed border-gray-200 mb-6">
                             <p className="text-gray-500">Visor de PDF próximamente...</p>
                         </div>
+
+                        <ChatInterface documentId={id} />
                     </div>
 
                     <div className="space-y-6">
