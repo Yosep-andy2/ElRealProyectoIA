@@ -72,3 +72,29 @@ def get_document(
     if doc is None:
         raise HTTPException(status_code=404, detail="Document not found")
     return doc
+
+@router.delete("/{document_id}", status_code=204)
+async def delete_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Delete a document and its associated file.
+    """
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    # Delete physical file
+    await FileHandler.delete_file(doc.file_path)
+    
+    # Delete from DB
+    db.delete(doc)
+    db.commit()
+    
+    return None

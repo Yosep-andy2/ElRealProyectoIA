@@ -27,6 +27,10 @@ const Library = () => {
         doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleDocumentDelete = (documentId) => {
+        setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -61,7 +65,7 @@ const Library = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredDocuments.map((doc) => (
-                        <DocumentCard key={doc.id} document={doc} />
+                        <DocumentCard key={doc.id} document={doc} onDelete={handleDocumentDelete} />
                     ))}
                 </div>
             )}

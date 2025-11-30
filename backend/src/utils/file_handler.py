@@ -43,3 +43,16 @@ class FileHandler:
             }
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Could not save file: {str(e)}")
+
+    @staticmethod
+    async def delete_file(file_path: str) -> None:
+        """
+        Deletes a file from the storage directory.
+        """
+        try:
+            path = Path(file_path)
+            if path.exists():
+                path.unlink()
+        except Exception as e:
+            # Log error but don't stop execution if file is already gone
+            print(f"Error deleting file {file_path}: {e}")
