@@ -1,15 +1,15 @@
 import { useState, useRef } from 'react';
 import { Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { documentService } from '../../services/documentService';
+import { useToast } from '../../context/ToastContext';
 import clsx from 'clsx';
 
 const DocumentUpload = ({ onUploadSuccess }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
     const fileInputRef = useRef(null);
+    const { addToast } = useToast();
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -34,14 +34,11 @@ const DocumentUpload = ({ onUploadSuccess }) => {
     };
 
     const validateAndSetFile = (file) => {
-        setError(null);
-        setSuccess(false);
-
         if (!file) return;
 
         const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/epub+zip'];
         if (!validTypes.includes(file.type)) {
-            setError('Formato de archivo no soportado. Usa PDF, DOCX, TXT o EPUB.');
+            addToast('Formato de archivo no soportado. Usa PDF, DOCX, TXT o EPUB.', 'error');
             return;
         }
 
@@ -52,19 +49,15 @@ const DocumentUpload = ({ onUploadSuccess }) => {
         if (!file) return;
 
         setUploading(true);
-        setError(null);
 
         try {
             await documentService.uploadDocument(file);
-            setSuccess(true);
+            addToast('Documento subido exitosamente', 'success');
             setFile(null);
             if (onUploadSuccess) onUploadSuccess();
-
-            // Reset success message after 3 seconds
-            setTimeout(() => setSuccess(false), 3000);
         } catch (err) {
             console.error(err);
-            setError('Error al subir el documento. Inténtalo de nuevo.');
+            addToast('Error al subir el documento. Inténtalo de nuevo.', 'error');
         } finally {
             setUploading(false);
         }
@@ -78,8 +71,7 @@ const DocumentUpload = ({ onUploadSuccess }) => {
                 onDrop={handleDrop}
                 className={clsx(
                     "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
-                    isDragging ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:border-indigo-400",
-                    error ? "border-red-300 bg-red-50" : ""
+                    isDragging ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:border-indigo-400"
                 )}
                 onClick={() => fileInputRef.current?.click()}
             >
@@ -105,20 +97,6 @@ const DocumentUpload = ({ onUploadSuccess }) => {
                     </div>
                 </div>
             </div>
-
-            {error && (
-                <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg flex items-center gap-2 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    {error}
-                </div>
-            )}
-
-            {success && (
-                <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg flex items-center gap-2 text-sm">
-                    <CheckCircle className="w-4 h-4" />
-                    Documento subido exitosamente
-                </div>
-            )}
 
             {file && (
                 <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
