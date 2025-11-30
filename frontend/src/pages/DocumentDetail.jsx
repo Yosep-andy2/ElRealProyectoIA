@@ -107,11 +107,20 @@ const DocumentDetail = () => {
                 <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         {/* PDF Viewer */}
-                        <div className="h-[600px]">
-                            <PDFViewer url={`http://localhost:8000/storage/documents/${document.filename}`} />
-                        </div>
+                        {document.file_type?.includes('pdf') && (
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-3">Vista del Documento</h3>
+                                <div className="h-[500px]">
+                                    <PDFViewer url={`http://localhost:8000/api/v1/documents/${document.id}/file`} />
+                                </div>
+                            </div>
+                        )}
 
-                        <ChatInterface documentId={id} />
+                        {/* Chat Interface */}
+                        <div>
+                            <h3 className="font-semibold text-gray-900 mb-3">Chat con el Documento</h3>
+                            <ChatInterface documentId={id} />
+                        </div>
                     </div>
 
                     <div className="space-y-6">

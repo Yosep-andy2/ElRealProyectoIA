@@ -98,3 +98,33 @@ async def delete_document(
     db.commit()
     
     return None
+
+@router.get("/{document_id}/file")
+async def get_document_file(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Serve the actual document file.
+    """
+    from fastapi.responses import FileResponse
+    from pathlib import Path
+    
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    file_path = Path(doc.file_path)
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found on disk")
+    
+    return FileResponse(
+        path=str(file_path),
+        media_type="application/pdf",
+        filename=doc.filename
+    )

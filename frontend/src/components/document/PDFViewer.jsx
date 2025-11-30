@@ -60,7 +60,12 @@ const PDFViewer = ({ url }) => {
             {/* Document */}
             <div className="flex-1 overflow-auto w-full flex justify-center p-4 min-h-[500px]">
                 <Document
-                    file={url}
+                    file={{
+                        url: url,
+                        httpHeaders: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    }}
                     onLoadSuccess={onDocumentLoadSuccess}
                     loading={
                         <div className="flex items-center justify-center h-64">

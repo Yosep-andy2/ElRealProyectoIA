@@ -6,9 +6,6 @@ const Sidebar = ({ isOpen }) => {
     const links = [
         { icon: Home, label: 'Dashboard', path: '/' },
         { icon: BookOpen, label: 'Biblioteca', path: '/library' },
-        { icon: Folder, label: 'Proyectos', path: '/projects' },
-        { icon: FileText, label: 'Documentos', path: '/documents' },
-        { icon: Settings, label: 'Configuración', path: '/settings' },
     ];
 
     return (
