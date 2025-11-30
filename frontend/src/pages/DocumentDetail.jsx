@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText, Calendar, User, Download } from 'lucide-react';
 import { documentService } from '../services/documentService';
 import ChatInterface from '../components/chat/ChatInterface';
+import PDFViewer from '../components/document/PDFViewer';
 
 const DocumentDetail = () => {
     const { id } = useParams();
@@ -87,8 +88,8 @@ const DocumentDetail = () => {
                                         </span>
                                     )}
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${document.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                            document.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-gray-100 text-gray-700'
+                                        document.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-gray-100 text-gray-700'
                                         }`}>
                                         {document.status === 'completed' ? 'Procesado' :
                                             document.status === 'processing' ? 'Procesando' : 'Subido'}
@@ -105,8 +106,9 @@ const DocumentDetail = () => {
 
                 <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-gray-50 rounded-lg p-8 text-center border-2 border-dashed border-gray-200 mb-6">
-                            <p className="text-gray-500">Visor de PDF próximamente...</p>
+                        {/* PDF Viewer */}
+                        <div className="h-[600px]">
+                            <PDFViewer url={`http://localhost:8000/storage/documents/${document.filename}`} />
                         </div>
 
                         <ChatInterface documentId={id} />
