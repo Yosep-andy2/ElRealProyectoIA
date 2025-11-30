@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..db.base import Base
 
@@ -12,3 +13,5 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    documents = relationship("Document", back_populates="owner")

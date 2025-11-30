@@ -9,11 +9,15 @@ from ...services.document_processor import DocumentProcessor
 
 router = APIRouter()
 
+from ...api import deps
+from ...models.user import User
+
 @router.post("/upload", status_code=201, response_model=DocumentResponse)
 async def upload_document(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
 ):
     """
     Upload a new document and start processing.
@@ -27,7 +31,8 @@ async def upload_document(
         filename=file_info["saved_filename"],
         file_path=file_info["file_path"],
         file_type=file_info["file_type"],
-        status=DocumentStatus.UPLOADED
+        status=DocumentStatus.UPLOADED,
+        user_id=current_user.id
     )
     db.add(doc)
     db.commit()
@@ -39,19 +44,31 @@ async def upload_document(
     return doc
 
 @router.get("/", response_model=List[DocumentResponse])
-def get_documents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_documents(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
     """
-    Retrieve all documents.
+    Retrieve all documents for the current user.
     """
-    docs = db.query(Document).offset(skip).limit(limit).all()
+    docs = db.query(Document).filter(Document.user_id == current_user.id).offset(skip).limit(limit).all()
     return docs
 
 @router.get("/{document_id}", response_model=DocumentResponse)
-def get_document(document_id: int, db: Session = Depends(get_db)):
+def get_document(
+    document_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
     """
     Get a specific document by ID.
     """
-    doc = db.query(Document).filter(Document.id == document_id).first()
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
     if doc is None:
         raise HTTPException(status_code=404, detail="Document not found")
     return doc
