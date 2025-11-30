@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from config import settings
+from ..config import settings
 
 # Use SQLite for local development if POSTGRES_SERVER is not set or is localhost without auth
 if settings.POSTGRES_SERVER == "localhost" and settings.POSTGRES_PASSWORD == "password":
