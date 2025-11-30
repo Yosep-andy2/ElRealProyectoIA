@@ -1,6 +1,7 @@
 from .vector_store import vector_store
 from .ai_service import AIService
 from ..models.document import Document
+from ..models.chat import ChatMessage, MessageRole
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
@@ -14,11 +15,16 @@ class ChatService:
         if not doc:
             raise HTTPException(status_code=404, detail="Document not found")
 
-        # 1. Retrieve relevant context
-        # In this real implementation, we assume the document was indexed during processing.
-        # If not (e.g. old doc), we might return a message or try to index on the fly (complex).
-        # For now, we rely on the processor.
-        
+        # 1. Save user message
+        user_message = ChatMessage(
+            document_id=document_id,
+            role=MessageRole.USER,
+            content=message
+        )
+        db.add(user_message)
+        db.commit()
+
+        # 2. Retrieve relevant context
         context_chunks = await vector_store.search(document_id, message)
         
         if not context_chunks:
@@ -26,7 +32,16 @@ class ChatService:
         else:
             context_str = "\n\n".join(context_chunks)
 
-        # 2. Generate Response using Real AI
+        # 3. Generate Response using AI
         response = await AIService.generate_chat_response(context_str, message)
+        
+        # 4. Save AI response
+        ai_message = ChatMessage(
+            document_id=document_id,
+            role=MessageRole.AI,
+            content=response
+        )
+        db.add(ai_message)
+        db.commit()
         
         return response

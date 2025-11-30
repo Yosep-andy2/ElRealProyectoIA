@@ -34,3 +34,6 @@ class Document(Base):
     # Owner
     user_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="documents")
+    
+    # Chat messages
+    chat_messages = relationship("ChatMessage", back_populates="document", cascade="all, delete-orphan")

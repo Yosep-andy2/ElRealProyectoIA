@@ -2,6 +2,7 @@ from src.db.base import Base
 from src.db.connection import engine
 from src.models.user import User
 from src.models.document import Document
+from src.models.chat import ChatMessage
 
 def init_db():
     print("Creating database tables...")

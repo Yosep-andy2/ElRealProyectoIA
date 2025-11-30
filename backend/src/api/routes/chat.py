@@ -31,3 +31,28 @@ async def chat_with_document(
 
     response = await ChatService.chat(document_id, request.message, db)
     return ChatResponse(response=response)
+
+@router.get("/{document_id}/history")
+async def get_chat_history(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Get chat history for a document.
+    """
+    # Verify ownership
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    from ..models.chat import ChatMessage
+    messages = db.query(ChatMessage).filter(
+        ChatMessage.document_id == document_id
+    ).order_by(ChatMessage.created_at).all()
+    
+    return [{"role": msg.role, "content": msg.content, "created_at": msg.created_at} for msg in messages]
