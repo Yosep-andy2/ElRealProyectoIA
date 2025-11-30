@@ -1,5 +1,5 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List, Union
 
 class Settings(BaseSettings):
@@ -17,8 +17,6 @@ class Settings(BaseSettings):
     # AI
     OPENAI_API_KEY: str
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
