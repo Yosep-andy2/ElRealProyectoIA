@@ -22,7 +22,7 @@ const ChatInterface = ({ documentId }) => {
     useEffect(() => {
         const loadHistory = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/v1/documents/${documentId}/chat/history`);
+                const response = await axios.get(`http://localhost:8000/api/v1/documents/${documentId}/history`);
                 const history = response.data;
 
                 if (history.length === 0) {

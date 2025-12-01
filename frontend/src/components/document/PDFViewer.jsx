@@ -1,21 +1,29 @@
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import ErrorBoundary from '../common/ErrorBoundary';
 
-// Configure worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Configure worker - use local copy
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 const PDFViewer = ({ url }) => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [scale, setScale] = useState(1.0);
+    const [error, setError] = useState(null);
 
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
+        setError(null);
+    }
+
+    function onDocumentLoadError(error) {
+        console.error('PDF Load Error:', error);
+        setError('Error al cargar el PDF. Por favor, intenta recargar la página.');
     }
 
     return (
-        <div className="flex flex-col items-center bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+        <div className="h-full flex flex-col bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
             {/* Toolbar */}
             <div className="w-full flex items-center justify-between p-2 bg-white border-b border-gray-200">
                 <div className="flex items-center gap-2">
@@ -58,34 +66,49 @@ const PDFViewer = ({ url }) => {
             </div>
 
             {/* Document */}
-            <div className="flex-1 overflow-auto w-full flex justify-center p-4 min-h-[500px]">
-                <Document
-                    file={{
-                        url: url,
-                        httpHeaders: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            <div className="flex-1 overflow-auto w-full flex justify-center items-start p-4">
+                {error ? (
+                    <div className="text-red-500 p-4 text-center">
+                        <p>{error}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                            Recargar página
+                        </button>
+                    </div>
+                ) : (
+                    <Document
+                        file={{
+                            url: url,
+                            httpHeaders: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
+                        }}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={onDocumentLoadError}
+                        loading={
+                            <div className="flex items-center justify-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                            </div>
                         }
-                    }}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    loading={
-                        <div className="flex items-center justify-center h-64">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                        </div>
-                    }
-                    error={
-                        <div className="text-red-500 p-4">
-                            Error al cargar el PDF. Asegúrate de que el archivo existe y es accesible.
-                        </div>
-                    }
-                >
-                    <Page
-                        pageNumber={pageNumber}
-                        scale={scale}
-                        renderTextLayer={false}
-                        renderAnnotationLayer={false}
-                        className="shadow-lg"
-                    />
-                </Document>
+                        error={
+                            <div className="text-red-500 p-4">
+                                Error al cargar el PDF. Asegúrate de que el archivo existe y es accesible.
+                            </div>
+                        }
+                    >
+                        <ErrorBoundary>
+                            <Page
+                                pageNumber={pageNumber}
+                                scale={scale}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                className="shadow-lg"
+                            />
+                        </ErrorBoundary>
+                    </Document>
+                )}
             </div>
         </div>
     );

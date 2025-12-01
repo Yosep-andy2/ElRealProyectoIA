@@ -50,7 +50,7 @@ async def get_chat_history(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     
-    from ..models.chat import ChatMessage
+    from ...models.chat import ChatMessage
     messages = db.query(ChatMessage).filter(
         ChatMessage.document_id == document_id
     ).order_by(ChatMessage.created_at).all()
