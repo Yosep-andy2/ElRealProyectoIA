@@ -1,4 +1,4 @@
-import { FileText, Calendar, Trash2 } from 'lucide-react';
+import { FileText, Calendar, Trash2, CheckCircle, Clock, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
@@ -37,13 +37,40 @@ const DocumentCard = ({ document, onDelete }) => {
         }
     };
 
+    const getStatusConfig = () => {
+        switch (document.status) {
+            case 'completed':
+                return {
+                    icon: CheckCircle,
+                    label: 'Procesado',
+                    className: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                };
+            case 'processing':
+                return {
+                    icon: Clock,
+                    label: 'Procesando',
+                    className: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
+                };
+            default:
+                return {
+                    icon: Upload,
+                    label: 'Subido',
+                    className: 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                };
+        }
+    };
+
+    const statusConfig = getStatusConfig();
+    const StatusIcon = statusConfig.icon;
+
     return (
         <div className="relative">
             <Link to={`/documents/${document.id}`} className="block group">
-                <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow relative">
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 hover-lift shadow-md transition-all duration-300">
+                    {/* Header */}
                     <div className="flex items-start justify-between mb-4">
-                        <div className="p-3 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
-                            <FileText className="w-6 h-6 text-indigo-600" />
+                        <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <FileText className="w-7 h-7 text-white" />
                         </div>
                         <button
                             onClick={(e) => {
@@ -51,58 +78,62 @@ const DocumentCard = ({ document, onDelete }) => {
                                 e.stopPropagation();
                                 setShowConfirm(true);
                             }}
-                            className="p-1 hover:bg-red-50 rounded-full text-gray-400 hover:text-red-600 transition-colors"
+                            className="p-2 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-600 transition-all duration-200 hover:scale-110"
                             title="Eliminar documento"
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                         </button>
                     </div>
 
-                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1" title={document.title}>
+                    {/* Title */}
+                    <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-teal-600 transition-colors" title={document.title}>
                         {document.title}
                     </h3>
 
-                    <div className="flex items-center gap-4 text-xs text-gray-500 mt-4">
-                        <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(document.created_at)}
-                        </div>
-                        {document.page_count && (
-                            <div className="flex items-center gap-1">
-                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                {document.page_count} págs
-                            </div>
-                        )}
+                    {/* Status Badge */}
+                    <div className="mb-4">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${statusConfig.className} shadow-sm`}>
+                            <StatusIcon className="w-3.5 h-3.5" />
+                            {statusConfig.label}
+                        </span>
                     </div>
 
-                    <div className="absolute top-4 right-12">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${document.status === 'completed' ? 'bg-green-100 text-green-700' :
-                            document.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-gray-100 text-gray-700'
-                            }`}>
-                            {document.status === 'completed' ? 'Procesado' :
-                                document.status === 'processing' ? 'Procesando' : 'Subido'}
-                        </span>
+                    {/* Meta Info */}
+                    <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t border-gray-100">
+                        <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>{formatDate(document.created_at)}</span>
+                        </div>
+                        {document.page_count && (
+                            <>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="font-medium">{document.page_count} págs</span>
+                            </>
+                        )}
                     </div>
                 </div>
             </Link>
 
+            {/* Delete Confirmation Modal */}
             {showConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowConfirm(false)}>
-                    <div className="bg-white rounded-lg p-6 max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-lg font-semibold mb-2">¿Eliminar documento?</h3>
-                        <p className="text-gray-600 mb-4">Esta acción no se puede deshacer.</p>
-                        <div className="flex gap-2 justify-end">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={() => setShowConfirm(false)}>
+                    <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center">
+                            <Trash2 className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-center text-gray-900">¿Eliminar documento?</h3>
+                        <p className="text-gray-600 mb-6 text-center">Esta acción no se puede deshacer.</p>
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => setShowConfirm(false)}
-                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                                className="flex-1 px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-colors"
                                 disabled={deleting}
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg disabled:opacity-50"
+                                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-lg rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={deleting}
                             >
                                 {deleting ? 'Eliminando...' : 'Eliminar'}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { chatService } from '../../services/chatService';
 import axios from 'axios';
 
@@ -26,10 +26,8 @@ const ChatInterface = ({ documentId }) => {
                 const history = response.data;
 
                 if (history.length === 0) {
-                    // No history, show welcome message
                     setMessages([{ role: 'ai', content: 'Hola, soy tu asistente de IA. ¿Qué te gustaría saber sobre este documento?' }]);
                 } else {
-                    // Load existing history
                     setMessages(history.map(msg => ({ role: msg.role, content: msg.content })));
                 }
             } catch (error) {
@@ -64,49 +62,68 @@ const ChatInterface = ({ documentId }) => {
     };
 
     return (
-        <div className="flex flex-col h-[600px] bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                    <Bot className="w-5 h-5 text-indigo-600" />
+        <div className="flex flex-col h-[600px] bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+            {/* Header with gradient */}
+            <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-500 to-purple-600">
+                <h3 className="font-bold text-white flex items-center gap-2">
+                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <Bot className="w-5 h-5 text-white" />
+                    </div>
                     Chat con el Documento
                 </h3>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50/50 to-white">
                 {loadingHistory ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                    <div className="flex flex-col justify-center items-center h-full">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                            <Sparkles className="w-8 h-8 text-blue-600" />
+                        </div>
+                        <p className="text-gray-600 font-medium">Cargando conversación...</p>
                     </div>
                 ) : (
                     <>
                         {messages.map((msg, idx) => (
                             <div
                                 key={idx}
-                                className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                                className={`flex items-start gap-3 animate-fade-in ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                                style={{ animationDelay: `${idx * 50}ms` }}
                             >
-                                <div className={`p-2 rounded-full flex-shrink-0 ${msg.role === 'user' ? 'bg-indigo-100' : 'bg-gray-100'
+                                {/* Avatar */}
+                                <div className={`p-2.5 rounded-xl flex-shrink-0 shadow-sm ${msg.role === 'user'
+                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                                        : 'bg-gradient-to-br from-gray-100 to-gray-200'
                                     }`}>
                                     {msg.role === 'user' ? (
-                                        <User className="w-4 h-4 text-indigo-600" />
+                                        <User className="w-5 h-5 text-white" />
                                     ) : (
-                                        <Bot className="w-4 h-4 text-gray-600" />
+                                        <Bot className="w-5 h-5 text-gray-700" />
                                     )}
                                 </div>
-                                <div className={`p-3 rounded-2xl max-w-[80%] text-sm ${msg.role === 'user'
-                                    ? 'bg-indigo-600 text-white rounded-tr-none'
-                                    : 'bg-gray-100 text-gray-800 rounded-tl-none'
+
+                                {/* Message Bubble */}
+                                <div className={`p-4 rounded-2xl max-w-[80%] shadow-sm ${msg.role === 'user'
+                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-sm'
+                                        : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
                                     }`}>
-                                    {msg.content}
+                                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                 </div>
                             </div>
                         ))}
+
+                        {/* Typing Indicator */}
                         {loading && (
-                            <div className="flex items-start gap-3">
-                                <div className="p-2 rounded-full bg-gray-100 flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-gray-600" />
+                            <div className="flex items-start gap-3 animate-fade-in">
+                                <div className="p-2.5 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 shadow-sm">
+                                    <Bot className="w-5 h-5 text-gray-700" />
                                 </div>
-                                <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none">
-                                    <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                                <div className="bg-white border border-gray-100 p-4 rounded-2xl rounded-tl-sm shadow-sm">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -115,20 +132,21 @@ const ChatInterface = ({ documentId }) => {
                 )}
             </div>
 
-            <form onSubmit={handleSend} className="p-4 border-t border-gray-200 bg-white">
-                <div className="flex gap-2">
+            {/* Input Area */}
+            <form onSubmit={handleSend} className="p-4 border-t border-gray-100 bg-white">
+                <div className="flex gap-3">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Escribe tu pregunta..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         disabled={loading}
                     />
                     <button
                         type="submit"
                         disabled={loading || !input.trim()}
-                        className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
                     >
                         <Send className="w-5 h-5" />
                     </button>
