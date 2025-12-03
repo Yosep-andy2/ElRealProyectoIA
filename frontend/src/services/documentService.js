@@ -13,8 +13,14 @@ export const documentService = {
         return response.data;
     },
 
-    getAllDocuments: async () => {
-        const response = await api.get('/documents');
+    getAllDocuments: async (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.search) queryParams.append('search', params.search);
+        if (params.status && params.status !== 'all') queryParams.append('status', params.status);
+        if (params.sortBy) queryParams.append('sort_by', params.sortBy);
+        if (params.order) queryParams.append('order', params.order);
+
+        const response = await api.get(`/documents/?${queryParams.toString()}`);
         return response.data;
     },
 

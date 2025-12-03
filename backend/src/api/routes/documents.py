@@ -46,14 +46,36 @@ async def upload_document(
 @router.get("/", response_model=List[DocumentResponse])
 def get_documents(
     skip: int = 0, 
-    limit: int = 100, 
+    limit: int = 100,
+    search: str = None,
+    status: DocumentStatus = None,
+    sort_by: str = "created_at",
+    order: str = "desc",
     db: Session = Depends(get_db),
     current_user: User = Depends(deps.get_current_user)
 ):
     """
-    Retrieve all documents for the current user.
+    Retrieve documents with filtering and sorting.
     """
-    docs = db.query(Document).filter(Document.user_id == current_user.id).offset(skip).limit(limit).all()
+    from sqlalchemy import desc, asc
+    
+    query = db.query(Document).filter(Document.user_id == current_user.id)
+    
+    # Filtering
+    if search:
+        query = query.filter(Document.title.ilike(f"%{search}%"))
+    
+    if status:
+        query = query.filter(Document.status == status)
+        
+    # Sorting
+    sort_column = getattr(Document, sort_by, Document.created_at)
+    if order == "desc":
+        query = query.order_by(desc(sort_column))
+    else:
+        query = query.order_by(asc(sort_column))
+        
+    docs = query.offset(skip).limit(limit).all()
     return docs
 
 @router.get("/{document_id}", response_model=DocumentResponse)

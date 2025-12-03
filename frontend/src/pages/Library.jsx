@@ -7,17 +7,34 @@ const Library = () => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [sortBy, setSortBy] = useState('newest');
     const [showFilters, setShowFilters] = useState(false);
 
+    // Debounce search term
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Load documents when filters change
     useEffect(() => {
         loadDocuments();
-    }, []);
+    }, [debouncedSearch, filterStatus, sortBy]);
 
     const loadDocuments = async () => {
+        setLoading(true);
         try {
-            const docs = await documentService.getAllDocuments();
+            const params = {
+                search: debouncedSearch,
+                status: filterStatus,
+                sortBy: sortBy === 'az' || sortBy === 'za' ? 'title' : 'created_at',
+                order: sortBy === 'oldest' || sortBy === 'az' ? 'asc' : 'desc'
+            };
+            const docs = await documentService.getAllDocuments(params);
             setDocuments(docs);
         } catch (error) {
             console.error('Error loading documents:', error);
@@ -30,20 +47,6 @@ const Library = () => {
         setDocuments(prev => prev.filter(doc => doc.id !== documentId));
     };
 
-    const filteredDocuments = documents
-        .filter(doc => {
-            const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesFilter = filterStatus === 'all' || doc.status === filterStatus;
-            return matchesSearch && matchesFilter;
-        })
-        .sort((a, b) => {
-            if (sortBy === 'newest') return new Date(b.created_at) - new Date(a.created_at);
-            if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
-            if (sortBy === 'az') return a.title.localeCompare(b.title);
-            if (sortBy === 'za') return b.title.localeCompare(a.title);
-            return 0;
-        });
-
     return (
         <div className="space-y-8 animate-fade-in">
             {/* Header */}
@@ -54,7 +57,7 @@ const Library = () => {
                             Biblioteca
                         </h2>
                         <p className="text-gray-600 mt-1">
-                            {documents.length} {documents.length === 1 ? 'documento' : 'documentos'}
+                            {documents.length} {documents.length === 1 ? 'documento' : 'documentos'} encontrados
                         </p>
                     </div>
 
@@ -134,7 +137,7 @@ const Library = () => {
                     </div>
                     <p className="text-gray-600 text-lg font-medium">Cargando biblioteca...</p>
                 </div>
-            ) : filteredDocuments.length === 0 ? (
+            ) : documents.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-md">
                     <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-full flex items-center justify-center">
                         {searchTerm || filterStatus !== 'all' ? (
@@ -172,7 +175,7 @@ const Library = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredDocuments.map((doc, index) => (
+                    {documents.map((doc, index) => (
                         <div
                             key={doc.id}
                             className="animate-fade-in"
