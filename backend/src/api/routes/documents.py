@@ -128,3 +128,79 @@ async def get_document_file(
         media_type="application/pdf",
         filename=doc.filename
     )
+
+@router.get("/{document_id}/export-chat")
+async def export_chat(
+    document_id: int,
+    format: str = "json",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Export chat history for a document in specified format (json, txt, md).
+    """
+    from fastapi.responses import JSONResponse, Response
+    from ...models.chat import ChatMessage
+    import json
+    from datetime import datetime
+
+    # Verify document ownership
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Get chat history
+    messages = db.query(ChatMessage).filter(
+        ChatMessage.document_id == document_id
+    ).order_by(ChatMessage.created_at).all()
+
+    if not messages:
+        raise HTTPException(status_code=404, detail="No chat history found")
+
+    # Format data
+    chat_data = [
+        {
+            "role": msg.role.value,
+            "content": msg.content,
+            "timestamp": msg.created_at.isoformat()
+        }
+        for msg in messages
+    ]
+
+    filename = f"chat_export_{doc.title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    if format == "json":
+        return JSONResponse(
+            content={"document": doc.title, "messages": chat_data},
+            headers={"Content-Disposition": f"attachment; filename={filename}.json"}
+        )
+    
+    elif format == "txt":
+        content = f"Chat History - {doc.title}\nExported: {datetime.now()}\n\n"
+        for msg in chat_data:
+            content += f"[{msg['timestamp']}] {msg['role'].upper()}:\n{msg['content']}\n\n{'-'*50}\n\n"
+        
+        return Response(
+            content=content,
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={filename}.txt"}
+        )
+    
+    elif format == "md":
+        content = f"# Chat History - {doc.title}\n*Exported: {datetime.now()}*\n\n"
+        for msg in chat_data:
+            role_icon = "👤" if msg['role'] == "user" else "🤖"
+            content += f"### {role_icon} {msg['role'].title()}\n{msg['content']}\n\n---\n\n"
+            
+        return Response(
+            content=content,
+            media_type="text/markdown",
+            headers={"Content-Disposition": f"attachment; filename={filename}.md"}
+        )
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid format. Use json, txt, or md")

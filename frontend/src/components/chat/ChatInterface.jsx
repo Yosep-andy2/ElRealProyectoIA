@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Loader2, Sparkles, Download, FileJson, FileText, FileCode } from 'lucide-react';
 import { chatService } from '../../services/chatService';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ const ChatInterface = ({ documentId }) => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingHistory, setLoadingHistory] = useState(true);
+    const [showExportMenu, setShowExportMenu] = useState(false);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -61,16 +62,70 @@ const ChatInterface = ({ documentId }) => {
         }
     };
 
+    const handleExport = async (format) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8000/api/v1/documents/${documentId}/export-chat?format=${format}`,
+                { responseType: 'blob' }
+            );
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const extension = format === 'md' ? 'md' : format;
+            link.setAttribute('download', `chat_export.${extension}`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setShowExportMenu(false);
+        } catch (error) {
+            console.error('Error exporting chat:', error);
+        }
+    };
+
     return (
         <div className="flex flex-col h-[600px] bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
             {/* Header with gradient */}
-            <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-500 to-purple-600">
+            <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 flex justify-between items-center">
                 <h3 className="font-bold text-white flex items-center gap-2">
                     <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                         <Bot className="w-5 h-5 text-white" />
                     </div>
                     Chat con el Documento
                 </h3>
+
+                <div className="relative">
+                    <button
+                        onClick={() => setShowExportMenu(!showExportMenu)}
+                        className="p-2 hover:bg-white/20 rounded-lg transition-colors text-white"
+                        title="Exportar chat"
+                    >
+                        <Download className="w-5 h-5" />
+                    </button>
+
+                    {showExportMenu && (
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-10 animate-scale-in">
+                            <button
+                                onClick={() => handleExport('json')}
+                                className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                                <FileJson className="w-4 h-4 text-blue-500" /> Exportar JSON
+                            </button>
+                            <button
+                                onClick={() => handleExport('txt')}
+                                className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                                <FileText className="w-4 h-4 text-gray-500" /> Exportar TXT
+                            </button>
+                            <button
+                                onClick={() => handleExport('md')}
+                                className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                                <FileCode className="w-4 h-4 text-purple-500" /> Exportar Markdown
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Messages Area */}
