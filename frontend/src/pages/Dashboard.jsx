@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { Upload, FileText, Clock, Activity, X, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, FileText, Clock, Activity, X, Sparkles, BarChart2, HardDrive } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import DocumentUpload from '../components/document/DocumentUpload';
+import { userService } from '../services/userService';
 
 const StatCard = ({ title, value, icon: Icon, gradient, delay = 0 }) => (
     <div
@@ -21,6 +23,28 @@ const StatCard = ({ title, value, icon: Icon, gradient, delay = 0 }) => (
 
 const Dashboard = () => {
     const [showUploadModal, setShowUploadModal] = useState(false);
+    const [stats, setStats] = useState({
+        total_documents: 0,
+        processed_documents: 0,
+        total_pages: 0,
+        storage_used_mb: 0,
+        activity_history: []
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadStats = async () => {
+            try {
+                const data = await userService.getStats();
+                setStats(data);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadStats();
+    }, []);
 
     return (
         <div className="space-y-8 animate-fade-in">
@@ -58,49 +82,109 @@ const Dashboard = () => {
                             <h3 className="text-2xl font-bold text-gray-900">Subir Nuevo Documento</h3>
                         </div>
                         <DocumentUpload onUploadSuccess={() => {
-                            setTimeout(() => setShowUploadModal(false), 1500);
+                            setTimeout(() => {
+                                setShowUploadModal(false);
+                                window.location.reload(); // Reload to update stats
+                            }, 1500);
                         }} />
                     </div>
                 </div>
             )}
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Documentos"
-                    value="12"
+                    value={loading ? "-" : stats.total_documents}
                     icon={FileText}
                     gradient="bg-gradient-to-br from-teal-500 to-cyan-600"
                     delay={0}
                 />
                 <StatCard
                     title="Procesados"
-                    value="8"
+                    value={loading ? "-" : stats.processed_documents}
                     icon={Activity}
                     gradient="bg-gradient-to-br from-emerald-500 to-emerald-600"
                     delay={100}
                 />
                 <StatCard
-                    title="Tiempo Ahorrado"
-                    value="4.5h"
-                    icon={Clock}
-                    gradient="bg-gradient-to-br from-amber-500 to-orange-600"
+                    title="Páginas Totales"
+                    value={loading ? "-" : stats.total_pages}
+                    icon={FileText}
+                    gradient="bg-gradient-to-br from-purple-500 to-pink-600"
                     delay={200}
+                />
+                <StatCard
+                    title="Almacenamiento"
+                    value={loading ? "-" : `${stats.storage_used_mb} MB`}
+                    icon={HardDrive}
+                    gradient="bg-gradient-to-br from-amber-500 to-orange-600"
+                    delay={300}
                 />
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
-                <div className="flex items-center gap-3 mb-6">
-                    <Sparkles className="w-6 h-6 text-teal-600" />
-                    <h3 className="text-xl font-bold text-gray-800">Actividad Reciente</h3>
-                </div>
-                <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-full flex items-center justify-center">
-                        <Activity className="w-10 h-10 text-teal-600" />
+            {/* Activity Chart */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="p-2 bg-teal-50 rounded-lg">
+                        <BarChart2 className="w-6 h-6 text-teal-600" />
                     </div>
-                    <p className="text-gray-500 text-lg">No hay actividad reciente para mostrar</p>
-                    <p className="text-gray-400 text-sm mt-2">Sube un documento para comenzar</p>
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800">Actividad de Subida</h3>
+                        <p className="text-sm text-gray-500">Documentos subidos en los últimos 7 días</p>
+                    </div>
+                </div>
+
+                <div className="h-[300px] w-full">
+                    {loading ? (
+                        <div className="h-full flex items-center justify-center">
+                            <div className="w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
+                        </div>
+                    ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={stats.activity_history}>
+                                <defs>
+                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#0d9488" stopOpacity={0.2} />
+                                        <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                    tickFormatter={(value) => {
+                                        const date = new Date(value);
+                                        return `${date.getDate()}/${date.getMonth() + 1}`;
+                                    }}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                    allowDecimals={false}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#fff',
+                                        borderRadius: '12px',
+                                        border: 'none',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                    }}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="count"
+                                    stroke="#0d9488"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorCount)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    )}
                 </div>
             </div>
         </div>
