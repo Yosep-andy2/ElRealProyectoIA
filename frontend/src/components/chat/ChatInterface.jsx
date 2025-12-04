@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Sparkles, Download, FileJson, FileText, FileCode } from 'lucide-react';
+import { Send, Bot, User, Loader2, Sparkles, Download, FileJson, FileText, FileCode, BookOpen } from 'lucide-react';
 import { chatService } from '../../services/chatService';
 import axios from 'axios';
 
 const ChatInterface = ({ documentId }) => {
+    // ... (keep existing state)
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -53,7 +54,11 @@ const ChatInterface = ({ documentId }) => {
 
         try {
             const response = await chatService.sendMessage(documentId, userMessage);
-            setMessages(prev => [...prev, { role: 'ai', content: response.response }]);
+            setMessages(prev => [...prev, {
+                role: 'ai',
+                content: response.response,
+                sources: response.sources
+            }]);
         } catch (error) {
             console.error('Error sending message:', error);
             setMessages(prev => [...prev, { role: 'ai', content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.' }]);
@@ -62,6 +67,7 @@ const ChatInterface = ({ documentId }) => {
         }
     };
 
+    // ... (keep handleExport)
     const handleExport = async (format) => {
         try {
             const response = await axios.get(
@@ -147,8 +153,8 @@ const ChatInterface = ({ documentId }) => {
                             >
                                 {/* Avatar */}
                                 <div className={`p-2.5 rounded-xl flex-shrink-0 shadow-sm ${msg.role === 'user'
-                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600'
-                                        : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                                    ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                                    : 'bg-gradient-to-br from-gray-100 to-gray-200'
                                     }`}>
                                     {msg.role === 'user' ? (
                                         <User className="w-5 h-5 text-white" />
@@ -159,10 +165,26 @@ const ChatInterface = ({ documentId }) => {
 
                                 {/* Message Bubble */}
                                 <div className={`p-4 rounded-2xl max-w-[80%] shadow-sm ${msg.role === 'user'
-                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-sm'
-                                        : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
+                                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-sm'
+                                    : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
                                     }`}>
                                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+
+                                    {/* Sources */}
+                                    {msg.sources && msg.sources.length > 0 && (
+                                        <div className="mt-3 pt-3 border-t border-gray-100">
+                                            <p className="text-xs text-gray-500 font-medium mb-2 flex items-center gap-1">
+                                                <BookOpen className="w-3 h-3" /> Fuentes:
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {msg.sources.map((source, i) => (
+                                                    <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md border border-gray-200">
+                                                        Página {source.page}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

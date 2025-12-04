@@ -10,11 +10,19 @@ class PDFParser:
         try:
             reader = pypdf.PdfReader(file_path)
             text = ""
-            for page in reader.pages:
-                text += page.extract_text() + "\n"
+            pages = []
+            
+            for i, page in enumerate(reader.pages):
+                page_text = page.extract_text()
+                text += page_text + "\n"
+                pages.append({
+                    "page_number": i + 1,
+                    "text": page_text
+                })
             
             return {
                 "text": text,
+                "pages": pages,
                 "page_count": len(reader.pages),
                 "metadata": reader.metadata
             }

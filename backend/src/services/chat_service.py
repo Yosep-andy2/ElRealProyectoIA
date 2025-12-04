@@ -7,9 +7,10 @@ from fastapi import HTTPException
 
 class ChatService:
     @staticmethod
-    async def chat(document_id: int, message: str, db: Session) -> str:
+    async def chat(document_id: int, message: str, db: Session) -> tuple[str, list]:
         """
         Process a chat message in the context of a document.
+        Returns response text and list of sources.
         """
         doc = db.query(Document).filter(Document.id == document_id).first()
         if not doc:
@@ -25,12 +26,28 @@ class ChatService:
         db.commit()
 
         # 2. Retrieve relevant context
-        context_chunks = await vector_store.search(document_id, message)
+        context_results = await vector_store.search(document_id, message)
         
-        if not context_chunks:
+        context_str = ""
+        sources = []
+        seen_pages = set()
+
+        if not context_results:
             context_str = "No se encontró contexto relevante en el documento."
         else:
-            context_str = "\n\n".join(context_chunks)
+            chunks_text = []
+            for result in context_results:
+                text = result["text"]
+                metadata = result["metadata"]
+                page_num = metadata.get("page_number", 0)
+                
+                chunks_text.append(f"[Página {page_num}]\n{text}")
+                
+                if page_num > 0 and page_num not in seen_pages:
+                    sources.append({"page": page_num})
+                    seen_pages.add(page_num)
+            
+            context_str = "\n\n".join(chunks_text)
 
         # 3. Generate Response using AI
         response = await AIService.generate_chat_response(context_str, message)
@@ -44,4 +61,4 @@ class ChatService:
         db.add(ai_message)
         db.commit()
         
-        return response
+        return response, sources

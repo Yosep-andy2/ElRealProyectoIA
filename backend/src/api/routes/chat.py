@@ -29,8 +29,8 @@ async def chat_with_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    response = await ChatService.chat(document_id, request.message, db)
-    return ChatResponse(response=response)
+    response, sources = await ChatService.chat(document_id, request.message, db)
+    return ChatResponse(response=response, sources=sources)
 
 @router.get("/{document_id}/history")
 async def get_chat_history(

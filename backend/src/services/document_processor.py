@@ -28,6 +28,7 @@ class DocumentProcessor:
             if doc.file_type == "application/pdf":
                 parse_result = PDFParser.extract_text(doc.file_path)
                 text_content = parse_result["text"]
+                pages = parse_result.get("pages", [])
                 doc.page_count = parse_result["page_count"]
                 
                 # Update metadata if available
@@ -36,13 +37,14 @@ class DocumentProcessor:
             else:
                 # Fallback for other formats or implement other parsers
                 text_content = "Contenido de texto no extraíble en esta versión."
+                pages = []
 
             # 2. Generate Summary
             summary = await AIService.generate_summary(text_content)
             doc.summary_short = summary
             
             # 3. Index in Vector Store
-            await vector_store.add_document(document_id, text_content)
+            await vector_store.add_document(document_id, text_content, pages=pages)
             
             # 4. Complete
             doc.status = DocumentStatus.COMPLETED
