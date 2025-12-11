@@ -4,6 +4,7 @@ import { ArrowLeft, FileText, Calendar, User, Download } from 'lucide-react';
 import { documentService } from '../services/documentService';
 import ChatInterface from '../components/chat/ChatInterface';
 import PDFViewer from '../components/document/PDFViewer';
+import Glossary from '../components/document/Glossary';
 
 const DocumentDetail = () => {
     const { id } = useParams();
@@ -143,6 +144,9 @@ const DocumentDetail = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* New Glossary Section */}
+                        <Glossary documentId={id} />
                     </div>
                 </div>
             </div>

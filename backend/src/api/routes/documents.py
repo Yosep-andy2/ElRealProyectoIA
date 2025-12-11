@@ -226,3 +226,40 @@ async def export_chat(
     
     else:
         raise HTTPException(status_code=400, detail="Invalid format. Use json, txt, or md")
+
+@router.post("/{document_id}/glossary", response_model=List[dict])
+async def generate_document_glossary(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Generate a glossary of keywords and definitions for the document.
+    """
+    from ...services.ai_service import AIService
+    from ...parsers.pdf_parser import PDFParser
+
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    try:
+        # 1. Extract text (using existing parser logic)
+        # In a production app, we should probably cache this text or store it in DB
+        text_content = ""
+        if doc.file_type == "application/pdf":
+            parse_result = PDFParser.extract_text(doc.file_path)
+            text_content = parse_result["text"]
+        else:
+             raise HTTPException(status_code=400, detail="Only PDF files are supported for glossary generation currently")
+             
+        # 2. Generate glossary
+        glossary = await AIService.generate_glossary(text_content)
+        return glossary
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating glossary: {str(e)}")

@@ -75,3 +75,38 @@ Respuesta (en español, clara y concisa):"""
         except Exception as e:
             print(f"Error generating chat response with Gemini: {e}")
             return f"Lo siento, hubo un error al procesar tu pregunta: {str(e)}"
+
+    @staticmethod
+    async def generate_glossary(text: str) -> list[dict]:
+        """
+        Extract keywords and definitions using Gemini.
+        """
+        try:
+            model = AIService._get_model()
+            
+            prompt = f"""Analiza el siguiente texto y extrae las 10-15 palabras clave, términos técnicos o conceptos más importantes.
+Para cada término, genera una definición breve y clara basada en el contexto o en conocimiento general si es un término estándar.
+Devuelve el resultado SOLO como una lista JSON válida, sin texto adicional ni bloques de código markdown.
+
+Formato esperado:
+[
+    {{"term": "Palabra Clave", "definition": "Definición clara y concisa."}},
+    ...
+]
+
+Texto:
+{text[:6000]}
+"""
+            
+            response = model.generate_content(prompt)
+            
+            # Clean response if it contains markdown code blocks
+            clean_text = response.text.replace("```json", "").replace("```", "").strip()
+            
+            import json
+            return json.loads(clean_text)
+            
+        except Exception as e:
+            print(f"Error generating glossary with Gemini: {e}")
+            return []
+

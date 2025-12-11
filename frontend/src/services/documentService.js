@@ -28,4 +28,9 @@ export const documentService = {
         const response = await api.get(`/documents/${id}`);
         return response.data;
     },
+
+    getGlossary: async (id) => {
+        const response = await api.post(`/documents/${id}/glossary`);
+        return response.data;
+    },
 };

@@ -22,5 +22,13 @@ class DocumentResponse(DocumentBase):
     author: Optional[str] = None
     summary_short: Optional[str] = None
 
+
     class Config:
         from_attributes = True
+
+class GlossaryItem(BaseModel):
+    term: str
+    definition: str
+
+class GlossaryResponse(BaseModel):
+    items: list[GlossaryItem]
