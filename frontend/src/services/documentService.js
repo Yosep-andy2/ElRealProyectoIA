@@ -33,4 +33,9 @@ export const documentService = {
         const response = await api.post(`/documents/${id}/glossary`);
         return response.data;
     },
+
+    generateQuiz: async (id) => {
+        const response = await api.post(`/documents/${id}/quiz`);
+        return response.data;
+    },
 };

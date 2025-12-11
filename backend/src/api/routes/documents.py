@@ -263,3 +263,39 @@ async def generate_document_glossary(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating glossary: {str(e)}")
+
+@router.post("/{document_id}/quiz", response_model=List[dict])
+async def generate_document_quiz(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Generate an IBM-style quiz for the document.
+    """
+    from ...services.ai_service import AIService
+    from ...parsers.pdf_parser import PDFParser
+
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    try:
+        # 1. Extract text
+        text_content = ""
+        if doc.file_type == "application/pdf":
+            parse_result = PDFParser.extract_text(doc.file_path)
+            text_content = parse_result["text"]
+        else:
+             raise HTTPException(status_code=400, detail="Only PDF files are supported for quiz generation currently")
+             
+        # 2. Generate quiz
+        quiz = await AIService.generate_quiz(text_content)
+        return quiz
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")

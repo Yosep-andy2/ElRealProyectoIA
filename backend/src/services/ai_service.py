@@ -110,3 +110,39 @@ Texto:
             print(f"Error generating glossary with Gemini: {e}")
             return []
 
+    @staticmethod
+    async def generate_quiz(text: str) -> list[dict]:
+        """
+        Generate a multiple choice quiz using Gemini.
+        """
+        try:
+            model = AIService._get_model()
+            
+            prompt = f"""Genera un examen tipo certificación "IBM" de 10 preguntas de opción múltiple basado en el siguiente texto.
+Las preguntas deben evaluar la comprensión profunda y la aplicación de conceptos, no solo la memorización.
+Formato de salida: SOLO una lista JSON válida.
+
+Estructura de cada pregunta:
+{{
+    "question": "Texto de la pregunta",
+    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+    "correct_answer": 0, (índice de la respuesta correcta: 0, 1, 2 o 3)
+    "explanation": "Breve explicación de por qué es la respuesta correcta."
+}}
+
+Texto:
+{text[:8000]}
+"""
+            
+            response = model.generate_content(prompt)
+            
+            # Clean response if it contains markdown code blocks
+            clean_text = response.text.replace("```json", "").replace("```", "").strip()
+            
+            import json
+            return json.loads(clean_text)
+            
+        except Exception as e:
+            print(f"Error generating quiz with Gemini: {e}")
+            return []
+

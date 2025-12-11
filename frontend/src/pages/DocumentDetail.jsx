@@ -5,6 +5,7 @@ import { documentService } from '../services/documentService';
 import ChatInterface from '../components/chat/ChatInterface';
 import PDFViewer from '../components/document/PDFViewer';
 import Glossary from '../components/document/Glossary';
+import Quiz from '../components/document/Quiz';
 
 const DocumentDetail = () => {
     const { id } = useParams();
@@ -145,8 +146,12 @@ const DocumentDetail = () => {
                             </div>
                         </div>
 
+
                         {/* New Glossary Section */}
                         <Glossary documentId={id} />
+
+                        {/* New Quiz Section */}
+                        <Quiz documentId={id} />
                     </div>
                 </div>
             </div>
