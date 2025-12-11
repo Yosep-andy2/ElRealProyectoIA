@@ -38,4 +38,11 @@ export const documentService = {
         const response = await api.post(`/documents/${id}/quiz`);
         return response.data;
     },
+
+    downloadStudyGuide: async (id) => {
+        const response = await api.post(`/documents/${id}/study-guide`, null, {
+            responseType: 'blob', // Important for file download
+        });
+        return response.data; // This is a Blob
+    },
 };

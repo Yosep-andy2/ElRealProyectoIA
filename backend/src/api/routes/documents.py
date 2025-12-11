@@ -299,3 +299,49 @@ async def generate_document_quiz(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
+
+@router.post("/{document_id}/study-guide")
+async def generate_study_guide(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Generate and download a Study Guide (Markdown file).
+    """
+    from fastapi.responses import Response
+    from ...services.ai_service import AIService
+    from ...parsers.pdf_parser import PDFParser
+    from datetime import datetime
+
+    doc = db.query(Document).filter(
+        Document.id == document_id,
+        Document.user_id == current_user.id
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    try:
+        # 1. Extract text
+        text_content = ""
+        if doc.file_type == "application/pdf":
+            parse_result = PDFParser.extract_text(doc.file_path)
+            text_content = parse_result["text"]
+        else:
+             raise HTTPException(status_code=400, detail="Only PDF files are supported")
+             
+        # 2. Generate guide
+        guide_content = await AIService.generate_study_guide(text_content)
+        
+        # 3. Return as file
+        filename = f"Guia_Estudio_{doc.title}_{datetime.now().strftime('%Y%m%d')}.md"
+        
+        return Response(
+            content=guide_content,
+            media_type="text/markdown",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating study guide: {str(e)}")

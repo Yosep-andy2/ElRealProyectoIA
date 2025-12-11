@@ -99,9 +99,31 @@ const DocumentDetail = () => {
                                 </div>
                             </div>
                         </div>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const blob = await documentService.downloadStudyGuide(id);
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `Guia_estudio_${document.title.replace(/\.[^/.]+$/, "")}.md`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                    document.body.removeChild(a);
+                                } catch (e) {
+                                    console.error("Error downloading guide", e);
+                                    alert("Error al descargar la guía");
+                                }
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 text-indigo-700 font-medium transition-colors"
+                        >
+                            <FileText className="w-4 h-4" />
+                            Guía de Estudio
+                        </button>
                         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700">
                             <Download className="w-4 h-4" />
-                            Descargar
+                            Descargar Original
                         </button>
                     </div>
                 </div>

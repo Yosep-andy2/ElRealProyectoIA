@@ -146,3 +146,40 @@ Texto:
             print(f"Error generating quiz with Gemini: {e}")
             return []
 
+    @staticmethod
+    async def generate_study_guide(text: str) -> str:
+        """
+        Generate a comprehensive study guide in Markdown format.
+        """
+        try:
+            model = AIService._get_model()
+            
+            prompt = f"""Actúa como un profesor experto y crea una Guía de Estudio detallada y estructurada basada en el siguiente texto.
+La guía debe estar en formato Markdown puro para ser descargada y leída fácilmente.
+
+Estructura requerida:
+# Guía de Estudio: [Título Conceptutal]
+
+## 1. Resumen Ejecutivo
+Un párrafo que sintetice la idea central del documento.
+
+## 2. Conceptos Clave
+Lista detallada de los conceptos más importantes. Usa **negritas** para los términos y explicaciones claras.
+
+## 3. Puntos Importantes y Citas
+Extractos clave o ideas fuerza que el estudiante debe recordar.
+
+## 4. Preguntas de Reflexión
+3-4 preguntas abiertas para ayudar a profundizar en el tema.
+
+Texto base:
+{text[:10000]}
+"""
+            
+            response = model.generate_content(prompt)
+            return response.text
+            
+        except Exception as e:
+            print(f"Error generating study guide with Gemini: {e}")
+            return "# Error al generar la guía\nLo siento, ocurrió un error. Intenta de nuevo."
+
