@@ -66,7 +66,7 @@ const DocumentCard = ({ document, onDelete }) => {
     return (
         <div className="relative">
             <Link to={`/documents/${document.id}`} className="block group">
-                <div className="bg-white rounded-2xl border border-gray-100 p-6 hover-lift shadow-md transition-all duration-300">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 hover-lift shadow-md transition-all duration-300">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                         <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -78,7 +78,7 @@ const DocumentCard = ({ document, onDelete }) => {
                                 e.stopPropagation();
                                 setShowConfirm(true);
                             }}
-                            className="p-2 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-600 transition-all duration-200 hover:scale-110"
+                            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 hover:scale-110"
                             title="Eliminar documento"
                         >
                             <Trash2 className="w-5 h-5" />
@@ -86,7 +86,7 @@ const DocumentCard = ({ document, onDelete }) => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-teal-600 transition-colors" title={document.title}>
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" title={document.title}>
                         {document.title}
                     </h3>
 
@@ -99,14 +99,14 @@ const DocumentCard = ({ document, onDelete }) => {
                     </div>
 
                     {/* Meta Info */}
-                    <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
                         <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
                             <span>{formatDate(document.created_at)}</span>
                         </div>
                         {document.page_count && (
                             <>
-                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></span>
                                 <span className="font-medium">{document.page_count} págs</span>
                             </>
                         )}
@@ -117,16 +117,16 @@ const DocumentCard = ({ document, onDelete }) => {
             {/* Delete Confirmation Modal */}
             {showConfirm && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={() => setShowConfirm(false)}>
-                    <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm mx-4 shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
                         <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center">
                             <Trash2 className="w-8 h-8 text-red-600" />
                         </div>
-                        <h3 className="text-xl font-bold mb-2 text-center text-gray-900">¿Eliminar documento?</h3>
-                        <p className="text-gray-600 mb-6 text-center">Esta acción no se puede deshacer.</p>
+                        <h3 className="text-xl font-bold mb-2 text-center text-gray-900 dark:text-white">¿Eliminar documento?</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">Esta acción no se puede deshacer.</p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowConfirm(false)}
-                                className="flex-1 px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-colors"
+                                className="flex-1 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
                                 disabled={deleting}
                             >
                                 Cancelar

@@ -24,29 +24,29 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-purple-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 animate-fade-in">
+        <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 animate-fade-in">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl shadow-xl animate-scale-in">
                         <Sparkles className="w-10 h-10 text-white" />
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-4xl font-extrabold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                <h2 className="mt-6 text-center text-4xl font-extrabold bg-gradient-to-r from-teal-600 to-cyan-600 dark:from-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">
                     Bienvenido a SIACTA
                 </h2>
-                <p className="mt-3 text-center text-base text-gray-600">
+                <p className="mt-3 text-center text-base text-gray-600 dark:text-gray-400">
                     ¿No tienes cuenta?{' '}
-                    <Link to="/register" className="font-semibold text-teal-600 hover:text-teal-700 transition-colors">
+                    <Link to="/register" className="font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors">
                         Regístrate gratis
                     </Link>
                 </p>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-fade-in" style={{ animationDelay: '100ms' }}>
-                <div className="bg-white/80 backdrop-blur-sm py-10 px-6 shadow-2xl rounded-2xl border border-white/20 sm:px-12">
+                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-10 px-6 shadow-2xl rounded-2xl border border-white/20 dark:border-gray-700 sm:px-12">
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Correo electrónico
                             </label>
                             <div className="relative">
@@ -61,14 +61,14 @@ const Login = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                                    className="block w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                                     placeholder="tu@email.com"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Contraseña
                             </label>
                             <div className="relative">
@@ -83,7 +83,7 @@ const Login = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                                    className="block w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>

@@ -6,13 +6,13 @@ import { userService } from '../services/userService';
 
 const StatCard = ({ title, value, icon: Icon, gradient, delay = 0 }) => (
     <div
-        className="bg-white p-6 rounded-xl border border-gray-100 shadow-md hover-lift animate-fade-in"
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-md hover-lift animate-fade-in"
         style={{ animationDelay: `${delay}ms` }}
     >
         <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
-                <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mb-1">{title}</p>
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{value}</h3>
             </div>
             <div className={`p-4 rounded-xl ${gradient} shadow-lg`}>
                 <Icon className="w-7 h-7 text-white" />
@@ -54,7 +54,7 @@ const Dashboard = () => {
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
                         Dashboard
                     </h2>
-                    <p className="text-gray-600 mt-1">Bienvenido de vuelta</p>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">Bienvenido de vuelta</p>
                 </div>
                 <button
                     onClick={() => setShowUploadModal(true)}
@@ -68,10 +68,10 @@ const Dashboard = () => {
             {/* Upload Modal */}
             {showUploadModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative animate-scale-in">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative animate-scale-in">
                         <button
                             onClick={() => setShowUploadModal(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-colors"
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
                         >
                             <X className="w-6 h-6" />
                         </button>
@@ -79,7 +79,7 @@ const Dashboard = () => {
                             <div className="p-3 gradient-primary rounded-xl">
                                 <Upload className="w-6 h-6 text-white" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900">Subir Nuevo Documento</h3>
+                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Subir Nuevo Documento</h3>
                         </div>
                         <DocumentUpload onUploadSuccess={() => {
                             setTimeout(() => {
@@ -124,14 +124,14 @@ const Dashboard = () => {
             </div>
 
             {/* Activity Chart */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-md p-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="p-2 bg-teal-50 rounded-lg">
-                        <BarChart2 className="w-6 h-6 text-teal-600" />
+                    <div className="p-2 bg-teal-50 dark:bg-teal-900/30 rounded-lg">
+                        <BarChart2 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-gray-800">Actividad de Subida</h3>
-                        <p className="text-sm text-gray-500">Documentos subidos en los últimos 7 días</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Actividad de Subida</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Documentos subidos en los últimos 7 días</p>
                     </div>
                 </div>
 

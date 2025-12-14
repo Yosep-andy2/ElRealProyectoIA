@@ -17,11 +17,11 @@ class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="text-center p-8 bg-white rounded-lg border border-red-200">
-                    <p className="text-red-600 mb-4 font-semibold">
+                <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg border border-red-200 dark:border-red-900/50">
+                    <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">
                         Error al cargar el PDF
                     </p>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                         {this.state.error?.message || 'Error desconocido'}
                     </p>
                     <button

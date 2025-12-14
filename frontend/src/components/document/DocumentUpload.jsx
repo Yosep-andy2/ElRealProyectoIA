@@ -70,8 +70,8 @@ const DocumentUpload = ({ onUploadSuccess }) => {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 className={clsx(
-                    "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
-                    isDragging ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:border-indigo-400"
+                    "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer dark:bg-gray-800/50",
+                    isDragging ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20" : "border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500"
                 )}
                 onClick={() => fileInputRef.current?.click()}
             >
@@ -84,14 +84,14 @@ const DocumentUpload = ({ onUploadSuccess }) => {
                 />
 
                 <div className="flex flex-col items-center gap-3">
-                    <div className="p-3 bg-indigo-100 rounded-full text-indigo-600">
+                    <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full text-indigo-600 dark:text-indigo-400">
                         <Upload className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-lg font-medium text-gray-700">
+                        <p className="text-lg font-medium text-gray-700 dark:text-gray-200">
                             Arrastra tu documento aquí o haz clic para seleccionar
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Soporta PDF, DOCX, TXT y EPUB
                         </p>
                     </div>
@@ -99,21 +99,21 @@ const DocumentUpload = ({ onUploadSuccess }) => {
             </div>
 
             {file && (
-                <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="mt-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-100 rounded-lg">
-                            <FileText className="w-5 h-5 text-gray-600" />
+                        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
-                            <p className="font-medium text-gray-800">{file.name}</p>
-                            <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            <p className="font-medium text-gray-800 dark:text-gray-200">{file.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                         <button
                             onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-400"
                             disabled={uploading}
                         >
                             <X className="w-5 h-5" />
