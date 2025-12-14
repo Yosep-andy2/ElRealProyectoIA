@@ -1,4 +1,4 @@
-import { Home, BookOpen, FileText, Settings, Folder } from 'lucide-react';
+import { Home, BookOpen, Star, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
 
@@ -6,6 +6,8 @@ const Sidebar = ({ isOpen }) => {
     const links = [
         { icon: Home, label: 'Dashboard', path: '/' },
         { icon: BookOpen, label: 'Biblioteca', path: '/library' },
+        { icon: Star, label: 'Favoritos', path: '/favorites' },
+        { icon: Settings, label: 'Configuración', path: '/settings' },
     ];
 
     return (

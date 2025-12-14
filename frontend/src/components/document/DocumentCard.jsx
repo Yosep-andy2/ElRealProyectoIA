@@ -1,13 +1,15 @@
-import { FileText, Calendar, Trash2, CheckCircle, Clock, Upload } from 'lucide-react';
+import { FileText, Calendar, Trash2, CheckCircle, Clock, Upload, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
+import { useFavorites } from '../../context/FavoritesContext';
 
 const DocumentCard = ({ document, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const { addToast } = useToast();
+    const { isFavorite, toggleFavorite } = useFavorites();
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('es-ES', {
@@ -35,6 +37,16 @@ const DocumentCard = ({ document, onDelete }) => {
             setDeleting(false);
             setShowConfirm(false);
         }
+    };
+
+    const handleToggleFavorite = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleFavorite(document.id);
+        addToast(
+            isFavorite(document.id) ? 'Eliminado de favoritos' : 'Añadido a favoritos',
+            'success'
+        );
     };
 
     const getStatusConfig = () => {
@@ -72,17 +84,29 @@ const DocumentCard = ({ document, onDelete }) => {
                         <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                             <FileText className="w-7 h-7 text-white" />
                         </div>
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setShowConfirm(true);
-                            }}
-                            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 hover:scale-110"
-                            title="Eliminar documento"
-                        >
-                            <Trash2 className="w-5 h-5" />
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleToggleFavorite}
+                                className={`p-2 rounded-xl transition-all duration-200 hover:scale-110 ${isFavorite(document.id)
+                                        ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30'
+                                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-amber-500'
+                                    }`}
+                                title={isFavorite(document.id) ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                            >
+                                <Star className={`w-5 h-5 ${isFavorite(document.id) ? 'fill-current' : ''}`} />
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setShowConfirm(true);
+                                }}
+                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 hover:scale-110"
+                                title="Eliminar documento"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Title */}
